@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <stdlib.h>
+#include <fcntl.h>
 
 
 class Server{
@@ -42,19 +43,19 @@ class Server{
         int Add_request(){
             int conn;
             char buffer[buffsize];
-            char res[buffsize];
             while(1){
                 conn = accept(sockid, nullptr, nullptr); 
                 if(conn < 0){
                     std::cerr << "Error Connecting to client" << std::endl;
                     exit(0);
                 }
-                memset(buffer, 0, buffsize);
-                memset(res, 0, buffsize);
-                read(conn, buffer, buffsize);
-                parse_command(buffer);
-                exec_commands(res, conn);
-                write(conn, "Done\n", 5);
+                while(fcntl(conn, F_GETFD) != -1){
+                    memset(buffer, 0, buffsize);
+                    read(conn, buffer, buffsize);
+                    parse_command(buffer);
+                    exec_commands(conn);
+                }
+                
             }
         }
 
@@ -134,7 +135,7 @@ class Server{
             buffer[i] = 0;
             std::cout << "Parsing Done\n" << std::endl;
         }
-        void exec_commands(char* res, int sock){
+        void exec_commands(int sock){
             std::string temp = "";
             std::string key;
             std::string val;
