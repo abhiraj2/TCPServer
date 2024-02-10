@@ -11,7 +11,8 @@
 #include <string>
 #include <cstring>
 #include <pthread.h>
-
+#include <signal.h>
+#include "main.hpp"
 
 int main(int argc, char ** argv) {
   int portno; /* port to listen on */
@@ -26,5 +27,5 @@ int main(int argc, char ** argv) {
 
   // DONE: Server port number taken as command line argument
   portno = atoi(argv[1]);
-
+  Server server(portno, 4);
 }
