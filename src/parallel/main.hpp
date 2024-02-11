@@ -58,7 +58,6 @@ class Server{
 
         int Add_request(){
             int conn;
-            char buffer[buffsize];
             while(1){
                 conn = accept(sockid, nullptr, nullptr); 
                 if(conn < 0){
@@ -195,7 +194,7 @@ class Server{
                     }
                     else write(sock, "FIN\n", 4);
                 }
-                else{
+                else if(temp[0] == '5'){
                     std::cout << "end " << std::endl;
                     write(sock, "\n", 1);
                     close(sock);
@@ -223,6 +222,7 @@ class Server{
                 while(fcntl(conn, F_GETFD) != -1){
                     memset(buffer, 0, buffsize);
                     read(conn, buffer, buffsize);
+                    std::cout << buffer << std::endl;
                     parse_command(buffer, requests);
                     exec_commands(requests, conn);
                 }
