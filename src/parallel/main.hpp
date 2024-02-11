@@ -33,6 +33,8 @@ class Server{
             server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
             sockid = socket(AF_INET, SOCK_STREAM, 0);
+            int iSetOption = 1;
+            setsockopt(sockid, SOL_SOCKET, SO_REUSEADDR, (char*)&iSetOption,sizeof(iSetOption));
             if(bind(sockid, (sockaddr*)&server_addr, sizeof(server_addr)) < 0){
                 std::cout << "Error binding, Port might be in use" << std::endl;
                 std::cerr << "Error " << std::strerror(errno) << std::endl;
