@@ -39,7 +39,7 @@ class Server{
                 exit(0); 
             }
 
-            if(listen(sockid, 5) < 0){
+            if(listen(sockid, 1024) < 0){
                 std::cerr << "Error Listening" << std::endl;
                 exit(0);
             }
