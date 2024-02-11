@@ -30,7 +30,7 @@ class Server{
             sockaddr_in server_addr;
             server_addr.sin_port = htons(PORT);
             server_addr.sin_family = AF_INET;
-            server_addr.sin_addr.s_addr = INADDR_ANY;
+            server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
             sockid = socket(AF_INET, SOCK_STREAM, 0);
             if(bind(sockid, (sockaddr*)&server_addr, sizeof(server_addr)) < 0){
@@ -51,15 +51,19 @@ class Server{
                 }
             }
             Add_request();
-            for(int i=0; i<SIZE; i++){
-                pthread_join(threads[i], NULL);
-            }
+            close(sockid);
+            // for(int i=0; i<SIZE; i++){
+            //     pthread_join(threads[i], NULL);
+            // }
         }
 
         int Add_request(){
             int conn;
             while(1){
-                conn = accept(sockid, nullptr, nullptr); 
+                sockaddr_in newSockaddr;
+                socklen_t socklen = sizeof(newSockaddr);
+                conn = accept(sockid, (sockaddr*)&newSockaddr, &socklen); 
+                std::cout << "New Client" << std::endl;
                 if(conn < 0){
                     std::cout << "Error Connecting to client" << std::endl;
                     exit(0);
@@ -67,7 +71,7 @@ class Server{
                 pthread_mutex_lock(&client_m);
                 clients.push(conn);
                 pthread_mutex_unlock(&client_m);
-                std::cout << "New Client" << std::endl;
+                
             }
         }
 
