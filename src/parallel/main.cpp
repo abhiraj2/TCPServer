@@ -27,5 +27,5 @@ int main(int argc, char ** argv) {
 
   // DONE: Server port number taken as command line argument
   portno = atoi(argv[1]);
-  Server server(portno, 8);
+  Server server(portno, 20);
 }
