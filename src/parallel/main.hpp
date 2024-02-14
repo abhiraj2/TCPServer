@@ -26,6 +26,7 @@ class Server{
             req_m = PTHREAD_MUTEX_INITIALIZER;
             kv_m = PTHREAD_MUTEX_INITIALIZER;
             client_m = PTHREAD_MUTEX_INITIALIZER;
+            client_c = PTHREAD_COND_INITIALIZER;
             threads = (pthread_t*)malloc(sizeof(pthread_t)*SIZE);
             sockaddr_in server_addr;
             server_addr.sin_port = htons(PORT);
@@ -72,6 +73,7 @@ class Server{
                 }
                 pthread_mutex_lock(&client_m);
                 clients.push(conn);
+                pthread_cond_signal(&client_c);
                 pthread_mutex_unlock(&client_m);
                 
             }
@@ -81,6 +83,7 @@ class Server{
         std::unordered_map<std::string, std::string> kv_store;
         std::queue<int> clients;
         pthread_mutex_t req_m, kv_m, client_m;
+        pthread_cond_t client_c;
         pthread_t* threads;
         
         void parse_command(char* buffer, std::queue<std::string>& reqs){
@@ -218,6 +221,9 @@ class Server{
             while(1){
                 pthread_mutex_lock(&client_m);
                 if(clients.size() <= 0){
+                    pthread_cond_wait(&client_c, &client_m);
+                }
+                if(clients.empty()){
                     pthread_mutex_unlock(&client_m);
                     continue;
                 }
